@@ -39,9 +39,15 @@ logs/
 *.log
 *.csv
 
+# Excel files (keep local)
+*.xlsx
+
 # Excel temp files
 ~$*.xlsx
 *.tmp
+
+# GitHub documentation (keep local)
+.github/copilot-instructions.md
 
 # OS
 .DS_Store

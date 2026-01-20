@@ -1,9 +1,0 @@
-2026-01-19 11:05:14,508 [INFO] === MT run started for target_lang=Portuguese_BR, target_col=Portuguese_BR ===
-2026-01-19 11:05:19,317 [INFO] --- Processing sheet 'PLAYER' ---
-2026-01-19 11:05:20,968 [INFO] [PLAYER] Total segments in sheet: 969
-2026-01-19 11:05:20,969 [INFO] [PLAYER] Segments to translate (should_translate): 893
-2026-01-19 11:05:20,969 [INFO] [PLAYER] Number of batches: 45
-2026-01-19 11:05:20,969 [INFO] [PLAYER] Processing batch 1/45 with 20 segments
-2026-01-19 11:05:20,969 [INFO] [Gemini] Calling gemini-2.5-flash-lite for batch of 20 segments (attempt 1/5)
-2026-01-19 11:05:20,970 [ERROR] [Gemini] Erreur lors de l'appel Gemini (attempt 1/5): name 'full_prompt' is not defined
-2026-01-19 11:05:20,970 [INFO] [Gemini] Retrying in 5.0s...
