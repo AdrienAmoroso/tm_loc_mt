@@ -105,6 +105,8 @@ def main() -> int:
         # Display success message
         success_text = Text()
         success_text.append("Translation pipeline completed successfully!\n", style="bold green")
+        success_text.append(f"Report file: ", style="dim")
+        success_text.append(f"logs/mt_report_{run_id}.html\n", style="cyan")
         success_text.append(f"Log file: ", style="dim")
         success_text.append(f"logs/mt_run_{run_id}.log\n", style="cyan")
         success_text.append(f"Status file: ", style="dim")

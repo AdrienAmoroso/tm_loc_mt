@@ -14,6 +14,7 @@ from excel_service import ExcelService
 from translation_service import TranslationService
 from validation_service import ValidationService
 from utils import PlaceholderManager
+from html_report_service import HTMLReportService
 
 logger = logging.getLogger(__name__)
 console = Console()
@@ -32,6 +33,7 @@ class LocalizationEngine:
     def run(self) -> None:
         """Execute the full translation pipeline."""
         logger.info(f"=== Starting translation for {self.config.translation.target_lang} ===")
+        run_id = self.keys_log_path.stem.split("_", 2)[-1]  # Extract run_id from filename
         
         try:
             existing_sheets = self.excel_service.get_existing_sheets()
@@ -67,6 +69,11 @@ class LocalizationEngine:
             
             logger.info(f"Total gaps filled: {total_gaps_filled}")
             logger.info(f"=== Translation complete ===")
+            
+            # Generate HTML report
+            html_path = HTMLReportService.generate_report(self.keys_log_path, run_id, self.config)
+            console.print(f"\n[bold cyan] Report generated: [/bold cyan][cyan]{html_path.name}[/cyan]")
+            logger.info(f"HTML report generated: {html_path}")
         
         except Exception as e:
             console.print(f"[bold red] Fatal error: {e}[/bold red]")

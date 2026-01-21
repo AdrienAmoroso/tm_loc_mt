@@ -26,7 +26,7 @@ SHEETS_TO_TRAD = [
 #    "MANAGER",
 #    "EQUIP",
 #    "TRAINING",
-#    "MATCH",
+    "MATCH",
     "STAFF",
 #    "INBOX",
 #    "PLAYER",
