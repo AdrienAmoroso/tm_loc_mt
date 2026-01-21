@@ -1,17 +1,10 @@
 # Tennis Manager - Localization Translation Tool
 
-An automated machine translation pipeline for localizing the "Tennis Manager 25" video game from English to Portuguese (Brazilian) using AI APIs.
+An automated machine translation pipeline for localizing the "Tennis Manager" video game from English to any language using AI APIs.
 
 ## Overview
 
 This tool automates the translation of in-game text from Excel-based localization files. It leverages AI (OpenAI GPT-4 or Google Gemini) to provide fast, accurate translations while preserving technical placeholders and game-specific formatting.
-
-**Key achievements:**
-- ✅ Automated 500+ segments in minutes (vs. hours manually)
-- ✅ Preserves game placeholders and technical tokens
-- ✅ Intelligent batch processing with error recovery
-- ✅ Comprehensive validation and logging
-- ✅ Beautiful progress UI for non-technical users
 
 ## Quick Start
 
@@ -33,16 +26,17 @@ python -m venv .venv
 Create `.env` with your API key:
 ```
 GEMINI_API_KEY=your_key_here
+OPENAI_API_KEY=your_key_here
 ```
 
 ## Features
 
 - **Batch Translation:** Processes segments in configurable batches (default: 40/batch)
 - **Placeholder Protection:** Preserves `{[variable]}` and `<tag>` patterns
-- **Dual AI Support:** Switch between Gemini and OpenAI with one flag
+- **Dual AI Support:** You can switch between Gemini and OpenAI with one flag
 - **Smart Validation:** Ensures all tokens are preserved in correct order
 - **Gap Filling:** Auto-detects and re-translates missed segments
-- **Rich UI:** Progress bars and real-time status (console clutter-free)
+- **Rich UI:** Progress bars and real-time status
 - **Comprehensive Logging:** Detailed logs in files, important info in console
 
 ## Configuration
@@ -96,23 +90,16 @@ TARGET_LANG = "Portuguese_BR"
 - **Python 3.13**
 - **Excel I/O:** openpyxl, pandas
 - **AI APIs:** OpenAI GPT-4o-mini, Google Gemini 2.5
-- **UI:** Rich (beautiful terminal output)
+- **UI:** Rich
 - **Config:** python-dotenv
 
 ## Output
 
 After translation completes:
-- ✅ `localization.xlsx` updated with Portuguese translations
-- 📊 `logs/mt_keys_*.csv` - Per-segment status report
-- 📋 `logs/mt_run_*.log` - Detailed execution log
+- `localization.xlsx` updated with language translations
+- `logs/mt_keys_*.csv` - Per-segment status report
+- `logs/mt_run_*.log` - Detailed execution log
 
-## Performance
-
-| Dataset Size | Time | Status |
-|---|---|---|
-| Small (100 segments) | 1-2 min | ✅ |
-| Medium (200 segments) | 2-3 min | ✅ |
-| Large (500 segments) | 5-7 min | ✅ |
 
 API rate limits handled automatically with exponential backoff.
 
@@ -130,16 +117,9 @@ All logs are saved locally (not uploaded to git):
 - **File:** Complete trace for debugging
 - **CSV:** Per-key status for easy analysis
 
-## Future Enhancements
-
-- [ ] Support for additional target languages
-- [ ] Web UI for non-technical users
-- [ ] Automated quality scoring
-- [ ] Context-aware translation hints
-
 ## License
 
-Private project for Tennis Manager 25 localization.
+Private project for Tennis Manager localization.
 
 ## Author
 
