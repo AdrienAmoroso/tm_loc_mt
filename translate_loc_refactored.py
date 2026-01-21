@@ -36,17 +36,31 @@ def setup_logging(config: Config) -> str:
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = config.logging.logs_dir / f"mt_run_{run_id}.log"
     
-    logging.basicConfig(
-        level=getattr(logging, config.logging.level),
-        format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
-        handlers=[
-            logging.FileHandler(log_file, encoding="utf-8"),
-            logging.StreamHandler(sys.stdout),
-        ]
+    # Create formatters
+    detailed_formatter = logging.Formatter(
+        "%(asctime)s [%(levelname)s] %(name)s - %(message)s"
     )
     
-    logging.getLogger("urllib3").setLevel(logging.WARNING)
-    logging.getLogger("google").setLevel(logging.WARNING)
+    # File handler: detailed logs (all levels)
+    file_handler = logging.FileHandler(log_file, encoding="utf-8")
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(detailed_formatter)
+    
+    # Console handler: only show WARNING and ERROR to avoid cluttering UI
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.WARNING)
+    console_handler.setFormatter(detailed_formatter)
+    
+    # Configure root logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
+    root_logger.addHandler(file_handler)
+    root_logger.addHandler(console_handler)
+    
+    # Suppress verbose third-party loggers
+    logging.getLogger("urllib3").setLevel(logging.ERROR)
+    logging.getLogger("google").setLevel(logging.ERROR)
+    logging.getLogger("openai").setLevel(logging.ERROR)
     
     return run_id
 

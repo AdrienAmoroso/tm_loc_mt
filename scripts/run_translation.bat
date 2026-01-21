@@ -67,11 +67,11 @@ set EXIT_CODE=%ERRORLEVEL%
 echo.
 if %EXIT_CODE% equ 0 (
     echo ====================================================================
-    echo ✅ Translation completed successfully!
+    echo Translation completed successfully!
     echo ====================================================================
 ) else (
     echo ====================================================================
-    echo ❌ Translation failed with exit code %EXIT_CODE%
+    echo Translation failed with exit code %EXIT_CODE%
     echo ====================================================================
     echo.
     echo Check the logs directory for details:

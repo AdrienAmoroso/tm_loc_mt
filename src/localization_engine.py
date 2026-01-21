@@ -46,7 +46,7 @@ class LocalizationEngine:
                 return
             
             # Main translation phase
-            console.print(f"\n[bold cyan]📋 Starting main translation phase ({len(sheets_to_process)} sheets)[/bold cyan]")
+            console.print(f"\n[bold cyan]📋 Starting translation ({len(sheets_to_process)} sheets)[/bold cyan]")
             for sheet_name in sheets_to_process:
                 translated = self._translate_sheet(sheet_name)
                 total_translated += translated
@@ -85,9 +85,11 @@ class LocalizationEngine:
             logger.info(f"[{sheet_name}] No segments to translate")
             return 0
         
+        logger.debug(f"[{sheet_name}] {len(segments_to_translate)} segments to translate")
+        
         # Build batches
         batches = self._build_batches(segments_to_translate)
-        logger.info(f"[{sheet_name}] {len(segments_to_translate)} segments in {len(batches)} batches")
+        logger.debug(f"[{sheet_name}] {len(batches)} batches created")
         
         # Process batches with progress bar
         all_translations = {}
@@ -102,7 +104,7 @@ class LocalizationEngine:
             task = progress.add_task(f"Translating {sheet_name}", total=len(batches))
             
             for i, batch in enumerate(batches, start=1):
-                logger.info(f"[{sheet_name}] Processing batch {i}/{len(batches)}")
+                logger.debug(f"[{sheet_name}] Processing batch {i}/{len(batches)} ({len(batch)} segments)")
                 
                 try:
                     batch_translations = self._process_batch(sheet_name, batch)
@@ -112,7 +114,7 @@ class LocalizationEngine:
                     
                     # Cooldown between batches
                     if i < len(batches):
-                        logger.info(f"[{sheet_name}] Cooldown {self.config.translation.batch_cooldown_seconds}s...")
+                        logger.debug(f"[{sheet_name}] Cooldown {self.config.translation.batch_cooldown_seconds}s...")
                         time.sleep(self.config.translation.batch_cooldown_seconds)
                 
                 except Exception as e:
@@ -125,6 +127,7 @@ class LocalizationEngine:
         if all_translations:
             self.excel_service.write_translations(sheet_name, all_translations)
         
+        logger.info(f"[{sheet_name}] Translated {len(all_translations)} segments")
         return len(all_translations)
     
     def _process_batch(self, sheet_name: str, batch: List[Segment]) -> Dict[int, str]:
@@ -140,7 +143,7 @@ class LocalizationEngine:
                 translated_text = translations.get(seg.key, "")
                 
                 if not translated_text or not translated_text.strip():
-                    logger.warning(f"[MT] No translation for key={seg.key}")
+                    logger.debug(f"[MT] No translation for key={seg.key}")
                     self._log_key(seg.sheet, seg.key, seg.row_idx, "NO_TRANSLATION")
                     continue
                 
@@ -165,7 +168,7 @@ class LocalizationEngine:
                 final_text = PlaceholderManager.restore(translated_text, placeholder_map)
                 result[seg.row_idx] = final_text
                 
-                logger.info(f"[MT] Translated key={seg.key} row={seg.row_idx}")
+                logger.debug(f"[MT] Translated key={seg.key} row={seg.row_idx}")
                 self._log_key(seg.sheet, seg.key, seg.row_idx, "OK")
         
         except Exception as e:
@@ -175,16 +178,16 @@ class LocalizationEngine:
     
     def _fill_gaps_in_sheet(self, sheet_name: str) -> int:
         """Find and fill gaps in a sheet."""
-        logger.info(f"[Verify] Checking for gaps in '{sheet_name}'...")
+        logger.debug(f"[Verify] Checking for gaps in '{sheet_name}'...")
         
         segments = self.excel_service.load_segments_from_sheet(sheet_name)
         gaps = [s for s in segments if s.needs_translation()]
         
         if not gaps:
-            logger.info(f"[Verify] No gaps in '{sheet_name}'")
+            logger.debug(f"[Verify] No gaps in '{sheet_name}'")
             return 0
         
-        logger.info(f"[Verify] Found {len(gaps)} gaps, attempting to fill...")
+        logger.info(f"[Verify] Found {len(gaps)} gaps in '{sheet_name}', attempting to fill...")
         
         gap_batches = self._build_batches(gaps)
         total_filled = 0
@@ -199,7 +202,7 @@ class LocalizationEngine:
             task = progress.add_task(f"Filling gaps in {sheet_name}", total=len(gap_batches))
             
             for i, batch in enumerate(gap_batches, start=1):
-                logger.info(f"[Verify] Gap batch {i}/{len(gap_batches)}")
+                logger.debug(f"[Verify] Gap batch {i}/{len(gap_batches)}")
                 
                 try:
                     gap_translations = self._process_batch(sheet_name, batch)
@@ -218,7 +221,7 @@ class LocalizationEngine:
                     progress.update(task, advance=1)
                     continue
         
-        logger.info(f"[Verify] Filled {total_filled} gaps")
+        logger.info(f"[Verify] Filled {total_filled} gaps in '{sheet_name}'")
         return total_filled
     
     def _build_batches(self, segments: List[Segment]) -> List[List[Segment]]:

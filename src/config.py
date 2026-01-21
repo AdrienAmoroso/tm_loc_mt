@@ -34,10 +34,10 @@ SHEETS_TO_TRAD = [
 #    "SCENARIOS",
 #    "TUTO",
 #    "FC",
-    "MEDIA",
+#    "MEDIA",
 #    "LD_INBOX",
 #    "LD_RADIO",
-#    "UI",
+    "UI",
 #    "WORLD",
 #    "LD_BRIEFING",
 #    "LD_OBJ_CA",
@@ -61,6 +61,9 @@ BATCH_COOLDOWN_SECONDS = 22.0
 # Use Gemini API (True) or OpenAI API (False)
 USE_GEMINI = True
 
+GEMINI_MODEL = "gemini-2.5-flash-lite"
+OPENAI_MODEL = "gpt-4o-mini"
+
 # ============================================================================
 # END OF CONFIGURATION SECTION
 # ============================================================================
@@ -70,8 +73,8 @@ USE_GEMINI = True
 class APIConfig:
     """API configuration for OpenAI and Gemini."""
     use_gemini: bool = True
-    gemini_model: str = "gemini-2.5-flash-lite"
-    openai_model: str = "gpt-4o-mini"
+    gemini_model: str = GEMINI_MODEL
+    openai_model: str = OPENAI_MODEL
     gemini_api_key: str = ""
     openai_api_key: str = ""
     max_retries_openai: int = 5

@@ -127,7 +127,7 @@ RESPONSE FORMAT
         
         for attempt in range(1, self.config.api.max_retries_gemini + 1):
             try:
-                logger.info(
+                logger.debug(
                     f"[Gemini] Calling {self.config.api.gemini_model} for batch of "
                     f"{len(batch)} segments (attempt {attempt}/{self.config.api.max_retries_gemini})"
                 )
@@ -142,7 +142,7 @@ RESPONSE FORMAT
                 result = self._parse_json_response(raw_text)
                 
                 if result:
-                    logger.info(f"[Gemini] Successfully translated {len(result)} segments")
+                    logger.debug(f"[Gemini] Successfully translated {len(result)} segments")
                 
                 return result
             
@@ -165,7 +165,7 @@ RESPONSE FORMAT
                 
                 if attempt < self.config.api.max_retries_gemini:
                     wait_time = 5.0 * attempt
-                    logger.info(f"[Gemini] Retrying in {wait_time}s...")
+                    logger.debug(f"[Gemini] Retrying in {wait_time}s...")
                     time.sleep(wait_time)
         
         if last_exception:
@@ -181,7 +181,7 @@ RESPONSE FORMAT
         
         for attempt in range(1, self.config.api.max_retries_openai + 1):
             try:
-                logger.info(
+                logger.debug(
                     f"[OpenAI] Calling {self.config.api.openai_model} for batch of "
                     f"{len(batch)} segments (attempt {attempt}/{self.config.api.max_retries_openai})"
                 )
@@ -198,7 +198,7 @@ RESPONSE FORMAT
                 result = self._parse_json_response(raw_text)
                 
                 if result:
-                    logger.info(f"[OpenAI] Successfully translated {len(result)} segments")
+                    logger.debug(f"[OpenAI] Successfully translated {len(result)} segments")
                 
                 return result
             
@@ -221,7 +221,7 @@ RESPONSE FORMAT
                 
                 if attempt < self.config.api.max_retries_openai:
                     wait_time = 5.0 * attempt
-                    logger.info(f"[OpenAI] Retrying in {wait_time}s...")
+                    logger.debug(f"[OpenAI] Retrying in {wait_time}s...")
                     time.sleep(wait_time)
         
         if last_exception:
