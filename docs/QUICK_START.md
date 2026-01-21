@@ -13,11 +13,11 @@
 ## What You'll See
 
 ```
-🎾 Tennis Manager 25 - Localization Translation
+Tennis Manager - Localization Translation
 
-⠋ MP_UI ████████░░░░░░░░░░░░░░ 5/10 [00:30<01:15]
+MP_UI ████████░░░░░░░░░░░░░░ 5/10 [00:30<01:15]
 
-✅ Translation completed successfully!
+Translation completed successfully!
 ```
 
 ---
@@ -72,4 +72,4 @@ TARGET_LANG = "Portuguese_BR"
 
 ---
 
-**Status:** Ready to use ✅
+**Status:** Ready to use 

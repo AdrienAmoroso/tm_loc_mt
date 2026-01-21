@@ -41,35 +41,35 @@ class LocalizationEngine:
             sheets_to_process = [s for s in self.config.translation.sheets_to_translate if s in existing_sheets]
             
             if not sheets_to_process:
-                console.print("[bold red]❌ No valid sheets to process[/bold red]")
+                console.print("[bold red] No valid sheets to process[/bold red]")
                 logger.error("No valid sheets to process")
                 return
             
             # Main translation phase
-            console.print(f"\n[bold cyan]📋 Starting translation ({len(sheets_to_process)} sheets)[/bold cyan]")
+            console.print(f"\n[bold cyan] Starting translation ({len(sheets_to_process)} sheets)[/bold cyan]")
             for sheet_name in sheets_to_process:
                 translated = self._translate_sheet(sheet_name)
                 total_translated += translated
             
-            console.print(f"[green]✅ Translated {total_translated} segments[/green]\n")
+            console.print(f"[green] Translated {total_translated} segments[/green]\n")
             logger.info(f"Total segments translated: {total_translated}")
             
             # Gap-filling phase
-            console.print(f"[bold cyan]🔍 Starting gap-filling phase[/bold cyan]")
+            console.print(f"[bold cyan] Starting gap-filling phase[/bold cyan]")
             for sheet_name in sheets_to_process:
                 gaps_filled = self._fill_gaps_in_sheet(sheet_name)
                 total_gaps_filled += gaps_filled
             
             if total_gaps_filled > 0:
-                console.print(f"[green]✅ Filled {total_gaps_filled} gaps[/green]\n")
+                console.print(f"[green] Filled {total_gaps_filled} gaps[/green]\n")
             else:
-                console.print(f"[yellow]ℹ️  No gaps found[/yellow]\n")
+                console.print(f"[yellow] No gaps found[/yellow]\n")
             
             logger.info(f"Total gaps filled: {total_gaps_filled}")
             logger.info(f"=== Translation complete ===")
         
         except Exception as e:
-            console.print(f"[bold red]❌ Fatal error: {e}[/bold red]")
+            console.print(f"[bold red] Fatal error: {e}[/bold red]")
             logger.error(f"[Main] Fatal error: {e}", exc_info=True)
             raise
     

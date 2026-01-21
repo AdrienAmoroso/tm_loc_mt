@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Tennis Manager 25 Localization Translation Pipeline
+Tennis Manager Localization Translation Pipeline
 
-A machine translation system for localizing the Tennis Manager 25 video game
+A machine translation system for localizing the Tennis Manager video game
 from English to multiple target languages using AI APIs (OpenAI/Gemini).
 
 Features:
@@ -76,7 +76,7 @@ def main() -> int:
         logger = logging.getLogger(__name__)
         
         # Display nice header
-        title = Text("🎾 Tennis Manager 25 - Localization Translation", style="bold cyan")
+        title = Text("Tennis Manager - Localization Translation", style="bold cyan")
         console.print(Panel(title, border_style="cyan"))
         
         # Display configuration
@@ -104,7 +104,7 @@ def main() -> int:
         
         # Display success message
         success_text = Text()
-        success_text.append("✅ Translation pipeline completed successfully!\n", style="bold green")
+        success_text.append("Translation pipeline completed successfully!\n", style="bold green")
         success_text.append(f"Log file: ", style="dim")
         success_text.append(f"logs/mt_run_{run_id}.log\n", style="cyan")
         success_text.append(f"Status file: ", style="dim")
@@ -118,12 +118,12 @@ def main() -> int:
         return 0
     
     except KeyboardInterrupt:
-        console.print("\n[bold red]⚠️  Translation interrupted by user[/bold red]")
+        console.print("\n[bold red] Translation interrupted by user[/bold red]")
         logger.warning("Translation interrupted by user")
         return 130
     
     except Exception as e:
-        console.print(f"\n[bold red]❌ Fatal error: {e}[/bold red]")
+        console.print(f"\n[bold red] Fatal error: {e}[/bold red]")
         logger.error(f"Fatal error: {e}", exc_info=True)
         return 1
 

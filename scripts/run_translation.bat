@@ -3,7 +3,7 @@ REM ============================================================================
 REM Tennis Manager Localization Translation Tool
 REM ============================================================================
 REM
-REM This batch file runs the translation pipeline for Tennis Manager 25.
+REM This batch file runs the translation pipeline for Tennis Manager.
 REM It handles virtual environment activation and Python execution.
 REM
 REM Usage: Double-click this file to start translation
@@ -14,6 +14,9 @@ setlocal enabledelayedexpansion
 
 REM Get the directory where this script is located
 cd /d "%~dp0"
+
+REM Go back to the project root (one level up from scripts)
+cd ..
 
 REM Check if virtual environment exists
 if not exist ".\.venv\Scripts\python.exe" (

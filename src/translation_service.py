@@ -33,7 +33,7 @@ class TranslationService:
         target = self.config.translation.target_lang
         
         return f"""
-You are a professional localization engine for the video game "Tennis Manager 25",
+You are a professional localization engine for the video game "Tennis Manager",
 a realistic tennis management game on PC. The player is the manager of a tennis academy
 and manages up to 8 players while meeting sporting and financial objectives.
 

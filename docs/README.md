@@ -1,4 +1,4 @@
-# Tennis Manager 25 - Localization Translation Tool
+# Tennis Manager - Localization Translation Tool
 
 ## Quick Start (1 Minute)
 
@@ -28,17 +28,17 @@ That's it! Your tool now automatically translates game text using AI.
 
 ### What You'll See
 ```
-🎾 Tennis Manager 25 - Localization Translation
+Tennis Manager - Localization Translation
 
 Configuration
 Target Language: Portuguese_BR
 Sheets: MP_UI
 Batch Size: 40
 
-📋 Starting translation phase
-⠋ MP_UI ████████░░░░░░░░░░░░ 5/10 [00:30<01:15]
+Starting translation phase
+MP_UI ------ ------- --------   5/10 [00:30<01:15]
 
-✅ Translation completed successfully!
+Translation completed successfully!
 ```
 
 ### Time Needed
