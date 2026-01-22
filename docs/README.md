@@ -48,6 +48,13 @@ OPENAI_API_KEY=your_key_here
 
 #### Step 4: Configure Translation Settings
 Run the tool once - it will ask you questions:
+#### Option A: Using Batch Script (Easiest)
+Simply double-click:
+```
+scripts/run_translation.bat
+```
+
+#### Option B: Using Python
 ```powershell
 python translate_loc.py
 ```
@@ -60,19 +67,6 @@ The tool will create `settings.ini` with your preferences. Answer these question
 - **Batch Size:** Default is 50 (higher = faster but riskier)
 
 **Setup complete!** Your configuration is saved to `settings.ini`.
-
-### Running Translations (Every time after)
-
-#### Option A: Using Batch Script (Easiest)
-Simply double-click:
-```
-scripts/run_translation.bat
-```
-
-#### Option B: Using Python
-```powershell
-python translate_loc.py
-```
 
 ### Results
 
@@ -216,7 +210,7 @@ python -m venv .venv
 This is normal! The tool automatically retries. Just wait.
 
 ### "Rate limited"
-The API is busy. Tool auto-retries with backoff. Patient wait = success.
+The API is busy. Tool auto-retries with backoff.
 
 ### Cells are empty or have issues
 1. Check `logs/mt_keys_*.csv` for status
