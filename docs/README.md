@@ -19,10 +19,20 @@ python -m venv .venv
 ```
 
 #### Step 2: Activate Virtual Environment and Install Dependencies
+
+First, activate the virtual environment:
 ```powershell
 .\.venv\Scripts\Activate.ps1
+```
+
+You should see `(.venv)` appear at the start of your PowerShell prompt.
+
+Then, install the required packages:
+```powershell
 pip install -r requirements.txt
 ```
+
+This will install all dependencies into your virtual environment.
 
 #### Step 3: Set Up API Key
 Create a `.env` file in the project root with your API key:
