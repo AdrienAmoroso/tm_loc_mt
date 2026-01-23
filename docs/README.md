@@ -47,7 +47,7 @@ OPENAI_API_KEY=your_key_here
 **Note:** Keep this file private! It contains your API credentials.
 
 #### Step 4: Configure Translation Settings
-Run the tool once - it will ask you questions:
+Run the tool once :
 
 The batch script at `scripts/run_translation.bat` will **only work after you complete steps 1-3**. For the first run, use Option B below:
 
@@ -92,6 +92,7 @@ target_column = Portuguese
 sheets = MATCH, STAFF
 batch_size = 50
 batch_cooldown_seconds = 22.0
+ai_prompt_file = custom_prompt.txt
 
 [API]
 provider = gemini
@@ -144,14 +145,6 @@ ai_prompt_file = custom_prompt.txt
 
 **Step 3:** Run the tool - it will use your custom prompt automatically.
 
-#### Option 2: Inline Prompt (Simple Cases)
-
-For short, simple prompts without special characters, add directly to `settings.ini`:
-
-```ini
-[Translation]
-ai_prompt = Translate video game UI text concisely. Keep it natural and clear.
-```
 
 #### Reset to Default Prompt
 
@@ -162,11 +155,6 @@ Comment out both options in `settings.ini`:
 # ai_prompt_file = custom_prompt.txt
 # ai_prompt = 
 ```
-
----
-
-## Features
-Delete `settings.ini` and run the tool again - it will ask setup questions.
 
 ---
 
