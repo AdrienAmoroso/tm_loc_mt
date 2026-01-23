@@ -22,9 +22,16 @@ BATCH_SIZE = _settings["batch_size"]
 BATCH_COOLDOWN_SECONDS = _settings["batch_cooldown_seconds"]
 USE_GEMINI = _settings["provider"] == "gemini"
 EXCEL_FILE = _settings["excel_file"]
+AI_PROMPT = _settings.get("ai_prompt", "")
 
 GEMINI_MODEL = "gemini-2.5-flash-lite"
 OPENAI_MODEL = "gpt-4o-mini"
+
+# Load AI prompt from file if specified in settings
+if not AI_PROMPT and _settings.get("ai_prompt_file"):
+    prompt_file = Path(_settings.get("ai_prompt_file"))
+    if prompt_file.exists():
+        AI_PROMPT = prompt_file.read_text(encoding="utf-8").strip()
 
 # ============================================================================
 # END OF CONFIGURATION SECTION
@@ -62,6 +69,7 @@ class TranslationConfig:
     sheets_to_translate: List[str] = None
     batch_size: int = BATCH_SIZE
     batch_cooldown_seconds: float = BATCH_COOLDOWN_SECONDS
+    ai_prompt: str = AI_PROMPT
     
     def __post_init__(self):
         if self.sheets_to_translate is None:

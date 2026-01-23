@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Tennis Manager Localization Translation Pipeline
+Excel Localization Translation Pipeline
 
-A machine translation system for localizing the Tennis Manager video game
-from English to multiple target languages using AI APIs (OpenAI/Gemini).
+A machine translation system for translating Excel-based localization files
+from a source language to multiple target languages using AI APIs (OpenAI/Gemini).
 
 Features:
 - Batch translation with placeholder preservation
@@ -11,6 +11,7 @@ Features:
 - Gap-filling for missed translations
 - Comprehensive logging and status tracking
 - Robust error handling with retries
+- Configurable AI prompts for domain-specific translations
 """
 
 import logging
@@ -70,7 +71,7 @@ def main() -> int:
         logger = logging.getLogger(__name__)
         
         # Display nice header
-        title = Text("Tennis Manager - Localization Translation", style="bold cyan")
+        title = Text("Localization Translation Tool", style="bold cyan")
         console.print(Panel(title, border_style="cyan"))
         
         # Display configuration

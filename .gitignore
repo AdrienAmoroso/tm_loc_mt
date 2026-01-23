@@ -57,3 +57,5 @@ Thumbs.db
 # Backups
 *.backup
 *.bak
+
+custom_prompt.txt

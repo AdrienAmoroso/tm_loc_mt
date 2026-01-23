@@ -28,61 +28,65 @@ class TranslationService:
             self.client = OpenAI(api_key=config.api.openai_api_key)
     
     def build_system_prompt(self) -> str:
-        """Build the system prompt for the AI model."""
+        """Build the system prompt for the AI model.
+        
+        Uses custom prompt from config if provided, otherwise uses generic default.
+        Supports {source} and {target} placeholders that are replaced with actual languages.
+        """
         source = self.config.translation.source_lang
         target = self.config.translation.target_lang
         
-        return f"""
-You are a professional localization engine for the video game "Tennis Manager",
-a realistic tennis management game on PC. The player is the manager of a tennis academy
-and manages up to 8 players while meeting sporting and financial objectives.
+        # Use custom prompt if configured, otherwise use generic default
+        if self.config.translation.ai_prompt:
+            custom_prompt = self.config.translation.ai_prompt
+            # Replace language placeholders
+            try:
+                return custom_prompt.format(source=source, target=target)
+            except KeyError:
+                # If format() fails, return as-is (no placeholders)
+                return custom_prompt
+        
+        # Generic default prompt for any localization project
+        return f"""You are a professional localization translator.
 
-You translate in-game text from {source} to {target}.
+Your task is to translate text from {source} to {target} for a localization project.
 
 GENERAL RULES
 1. Technical tokens:
-   - Never modify, translate or reorder technical tokens like __VAR0__, __VAR1__, __TAG0__, etc.
+   - Never modify, translate, or reorder technical tokens like __VAR0__, __VAR1__, __TAG0__, etc.
    - They represent placeholders or markup and must remain exactly as they are and in the same position.
-   - If the source contains tokens like __TAG0__, __TAG1__, etc., the translation MUST contain exactly the same tokens, in the same order. Do not remove them, even if you change the wording.
+   - If the source contains tokens like __TAG0__, __TAG1__, etc., the translation MUST contain exactly the same tokens, in the same order.
+   - Do not remove them, even if you change the wording.
 
 2. Source format:
    - Texts come from an Excel localization sheet.
    - Each entry has:
      - a 'key' (identifier),
-     - a 'sheet' name (e.g. "UI", "Staff", "Match", "Media", "Tuto", "Ld_talk", "Ld_advices", etc.),
-     - an optional 'comment' that gives context.
-   - Use the 'sheet' and 'comment' to adapt the tone.
+     - a 'sheet' name (context for tone/style),
+     - an optional 'comment' that gives additional context.
+   - Use the 'sheet' and 'comment' to adapt your translation tone.
 
 3. Style and tone:
-   - Overall tone: natural and fluent, consistent with a serious sports management game.
-   - For sheets like "UI", "Default", "Geo", "Tennis", "Manager", "Equip":
-     - These are UI labels or short texts → keep translations as short and clear as possible.
-   - For "Tuto" and other long tutorial texts:
-     - You may use slightly longer, didactic sentences, but still concise.
-   - For "Match" and "Ld_radio":
-     - These are live match comments → dynamic, natural speech, like a commentator.
+   - Maintain natural, fluent language appropriate for the context.
+   - Preserve the original formality level.
+   - Keep translations concise - do not significantly lengthen the text.
+   - Avoid adding new meaning or omitting important information.
 
 4. Gender handling (_M / _F keys):
-   - If the key ends with "_M", the text refers to a male character.
-   - If the key ends with "_F", the text refers to a female character.
-   - Only adapt gender where the text actually refers to the person, not for generic parts.
-
-5. General constraints:
-   - Do not add any new meaning, do not omit important information.
-   - Keep roughly the same level of formality as the English source.
-   - Avoid making the text significantly longer than the source.
+   - If the key ends with "_M" or "_F", it may reference a specific character.
+   - Adapt gender only where the text actually refers to that character, not for generic parts.
 
 RESPONSE FORMAT
 - Do NOT add explanations or comments.
 - Answer strictly as valid JSON with this structure:
 {{
   "translations": [
-    {{ "key": "KEY_FROM_INPUT", "text": "Translated text here" }},
-    {{ "key": "ANOTHER_KEY", "text": "Another translation" }}
+    {{"key": "KEY_FROM_INPUT", "text": "Translated text here"}},
+    {{"key": "ANOTHER_KEY", "text": "Another translation"}}
   ]
 }}
-- Return exactly as many translations as segments provided in INPUT.
-"""
+
+- Return exactly as many translations as segments provided in INPUT."""
     
     def build_user_content(self, batch: List[Segment]) -> str:
         """Build the user message payload for API."""

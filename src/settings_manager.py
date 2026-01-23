@@ -32,7 +32,7 @@ class SettingsManager:
     def load(self) -> dict:
         """Load settings from INI file."""
         if not self.settings_path.exists():
-            console.print("[yellow]⚠️  settings.ini not found. Running setup wizard...[/yellow]\n")
+            console.print("[yellow]settings.ini not found. Running setup wizard...[/yellow]\n")
             self.run_setup_wizard()
         
         self.config.read(self.settings_path)
@@ -51,6 +51,18 @@ class SettingsManager:
             "rate_limit_wait": self.config.getfloat("API", "rate_limit_wait"),
             "excel_file": self.config.get("Excel", "excel_file"),
         }
+        
+        # Optional: ai_prompt or ai_prompt_file
+        if self.config.has_option("Translation", "ai_prompt_file"):
+            settings["ai_prompt_file"] = self.config.get("Translation", "ai_prompt_file")
+        else:
+            settings["ai_prompt_file"] = None
+        
+        if self.config.has_option("Translation", "ai_prompt"):
+            settings["ai_prompt"] = self.config.get("Translation", "ai_prompt")
+        else:
+            settings["ai_prompt"] = ""
+        
         self._validate_settings(settings)
         return settings
     
@@ -86,7 +98,7 @@ class SettingsManager:
     
     def run_setup_wizard(self) -> None:
         """Interactive setup wizard for first-time configuration."""
-        title = Text("🎾 Tennis Manager Translation - Initial Setup", style="bold cyan")
+        title = Text("Tennis Manager Translation - Initial Setup", style="bold cyan")
         console.print(Panel(title, border_style="cyan"))
         console.print()
         
@@ -180,7 +192,7 @@ class SettingsManager:
             
             console.print(f"[yellow]Warning: Sheet '{item}' not found, skipping[/yellow]")
         
-        return sheets or ["MATCH"]  # Default fallback
+        return sheets or [AVAILABLE_SHEETS[0]]  # Default fallback
     
     def _save_settings(self, target_lang: str, target_col: str, sheets: List[str], 
                        batch_size: int, provider: str) -> None:
@@ -193,6 +205,7 @@ class SettingsManager:
             "sheets": ", ".join(sheets),
             "batch_size": str(batch_size),
             "batch_cooldown_seconds": "22.0",
+            "# ai_prompt_file": "custom_prompt.txt",
         }
         
         config["API"] = {
