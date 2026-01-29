@@ -8,7 +8,7 @@ import pytest
 # Add src directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from models import Segment, TranslationResult, ValidationReport
+from models import Segment
 
 
 @pytest.fixture

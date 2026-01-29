@@ -1,9 +1,9 @@
 """Configuration management for the translation pipeline."""
 
-from pathlib import Path
-from dataclasses import dataclass
-from typing import List
 import os
+from dataclasses import dataclass
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 from settings_manager import load_settings
@@ -41,6 +41,7 @@ if not AI_PROMPT and _settings.get("ai_prompt_file"):
 @dataclass
 class APIConfig:
     """API configuration for OpenAI and Gemini."""
+
     use_gemini: bool = USE_GEMINI
     gemini_model: str = GEMINI_MODEL
     openai_model: str = OPENAI_MODEL
@@ -49,7 +50,7 @@ class APIConfig:
     max_retries_openai: int = _settings["max_retries"]
     max_retries_gemini: int = _settings["max_retries"]
     rate_limit_wait: float = _settings["rate_limit_wait"]
-    
+
     def validate(self) -> None:
         """Validate that required API keys are configured."""
         if self.use_gemini:
@@ -63,14 +64,15 @@ class APIConfig:
 @dataclass
 class TranslationConfig:
     """Translation settings."""
+
     source_lang: str = "English"
     target_lang: str = TARGET_LANG
     target_col: str = TARGET_COL
-    sheets_to_translate: List[str] = None
+    sheets_to_translate: list[str] = None
     batch_size: int = BATCH_SIZE
     batch_cooldown_seconds: float = BATCH_COOLDOWN_SECONDS
     ai_prompt: str = AI_PROMPT
-    
+
     def __post_init__(self):
         if self.sheets_to_translate is None:
             self.sheets_to_translate = SHEETS_TO_TRAD.copy()
@@ -79,11 +81,12 @@ class TranslationConfig:
 @dataclass
 class ExcelConfig:
     """Excel file configuration."""
+
     excel_path: str = EXCEL_FILE
     keys_column: str = "Keys"
     comment_column: str = "$comment"
     donottranslate_column: str = "$donottranslate"
-    
+
     @property
     def excel_path_obj(self) -> Path:
         """Get Excel path as Path object."""
@@ -93,9 +96,10 @@ class ExcelConfig:
 @dataclass
 class LoggingConfig:
     """Logging configuration."""
+
     logs_dir: Path = None
     level: str = "INFO"
-    
+
     def __post_init__(self):
         if self.logs_dir is None:
             self.logs_dir = Path("logs")
@@ -104,37 +108,36 @@ class LoggingConfig:
 
 class Config:
     """Main configuration container."""
-    
+
     def __init__(self):
         load_dotenv()
-        
+
         self.api = APIConfig(
             use_gemini=USE_GEMINI,
             gemini_api_key=os.getenv("GEMINI_API_KEY", ""),
             openai_api_key=os.getenv("OPENAI_API_KEY", ""),
         )
-        
+
         self.translation = TranslationConfig()
         self.excel = ExcelConfig()
         self.logging = LoggingConfig()
-        
+
         self.api.validate()
-    
+
     @classmethod
     def from_env(cls) -> "Config":
         """Create config from environment variables (overrides defaults)."""
         config = cls()
-        
+
         # Allow environment variables to override defaults
         if target_lang := os.getenv("TARGET_LANG"):
             config.translation.target_lang = target_lang
             config.translation.target_col = target_lang
-        
+
         if sheets := os.getenv("SHEETS_TO_TRAD"):
             config.translation.sheets_to_translate = [s.strip() for s in sheets.split(",")]
-        
+
         if batch_size := os.getenv("BATCH_SIZE"):
             config.translation.batch_size = int(batch_size)
-        
-        return config
 
+        return config

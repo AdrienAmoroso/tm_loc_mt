@@ -1,35 +1,34 @@
 """Utility functions for placeholder handling and text processing."""
 
 import re
-from typing import Dict, Tuple
 
 
 class PlaceholderManager:
     """Manages protection and restoration of placeholder tokens in text."""
-    
+
     PLACEHOLDER_PATTERN_TAG = re.compile(r"<[^>]+>")
     PLACEHOLDER_PATTERN_VAR = re.compile(r"{\[[^}]+\]}")
     TOKEN_PATTERN = re.compile(r"__(?:VAR|TAG)\d+__")
-    
+
     @staticmethod
-    def protect(text: str) -> Tuple[str, Dict[str, str]]:
+    def protect(text: str) -> tuple[str, dict[str, str]]:
         """
         Replace placeholders with safe tokens.
-        
+
         Returns:
             Tuple of (protected_text, token_to_original_map)
         """
-        placeholder_map: Dict[str, str] = {}
-        
+        placeholder_map: dict[str, str] = {}
+
         def replace_with_tokens(pattern, prefix, input_text):
             matches = list(pattern.finditer(input_text))
             if not matches:
                 return input_text
-            
+
             out = []
             last = 0
             for i, m in enumerate(matches):
-                out.append(input_text[last:m.start()])
+                out.append(input_text[last : m.start()])
                 original = m.group(0)
                 token = f"__{prefix}{i}__"
                 placeholder_map[token] = original
@@ -37,13 +36,15 @@ class PlaceholderManager:
                 last = m.end()
             out.append(input_text[last:])
             return "".join(out)
-        
+
         protected = replace_with_tokens(PlaceholderManager.PLACEHOLDER_PATTERN_VAR, "VAR", text)
-        protected = replace_with_tokens(PlaceholderManager.PLACEHOLDER_PATTERN_TAG, "TAG", protected)
+        protected = replace_with_tokens(
+            PlaceholderManager.PLACEHOLDER_PATTERN_TAG, "TAG", protected
+        )
         return protected, placeholder_map
-    
+
     @staticmethod
-    def restore(text: str, placeholder_map: Dict[str, str]) -> str:
+    def restore(text: str, placeholder_map: dict[str, str]) -> str:
         """Restore original placeholders from tokens."""
         restored = text
         # Sort tokens to ensure deterministic replacement order
@@ -51,12 +52,12 @@ class PlaceholderManager:
             original = placeholder_map[token]
             restored = restored.replace(token, original)
         return restored
-    
+
     @staticmethod
     def extract_tokens(text: str) -> list:
         """Extract all placeholder tokens from text."""
         return PlaceholderManager.TOKEN_PATTERN.findall(text)
-    
+
     @staticmethod
     def tokens_in_order(text: str, tokens: list) -> bool:
         """Check if tokens appear in the same order in text."""

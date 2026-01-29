@@ -3,7 +3,10 @@
 > AI-powered batch translation pipeline for Excel-based localization files with placeholder preservation and validation.
 
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](../LICENSE)
+[![Tests](https://img.shields.io/badge/tests-42%20passed-brightgreen.svg)](../tests/)
+[![Ruff](https://img.shields.io/badge/linting-Ruff-purple.svg)](https://docs.astral.sh/ruff/)
+[![CI](https://github.com/AdrienAmoroso/tm_loc_mt/actions/workflows/ci.yml/badge.svg)](https://github.com/AdrienAmoroso/tm_loc_mt/actions)
 
 ---
 
@@ -13,8 +16,9 @@
 - **Data Pipeline Architecture** — Batch processing with validation, gap-filling, and rollback safety
 - **Placeholder Protection** — Regex-based token extraction/restoration preserving `{[var]}` and `<tag>` patterns
 - **Clean Code Practices** — Service-oriented architecture, dataclasses, type hints, comprehensive logging
+- **Testing** — 42 unit tests with pytest covering core validation logic (100% coverage on critical modules)
+- **CI/CD** — GitHub Actions pipeline with Ruff linting, pytest, and build verification
 - **User Experience** — Interactive setup wizard, Rich CLI progress bars, INI-based configuration
-- **Error Handling** — Exponential backoff, validation checks, detailed status reporting
 
 ---
 
@@ -27,6 +31,8 @@
 | **Data** | pandas, openpyxl |
 | **CLI** | Rich |
 | **Config** | python-dotenv, configparser |
+| **Testing** | pytest, pytest-cov |
+| **Linting** | Ruff |
 
 ---
 
@@ -48,14 +54,21 @@ python translate_loc.py
 ## Architecture
 
 ```
-src/
-├── localization_engine.py   # Orchestrator — batch processing, gap-filling
-├── translation_service.py   # AI API calls with retry logic
-├── validation_service.py    # Placeholder preservation checks
-├── excel_service.py         # Excel I/O operations
-├── settings_manager.py      # Interactive setup wizard
-├── config.py                # Configuration loader
-└── models.py                # Segment dataclass
+├── src/
+│   ├── localization_engine.py   # Orchestrator — batch processing, gap-filling
+│   ├── translation_service.py   # AI API calls with retry logic
+│   ├── validation_service.py    # Placeholder preservation checks
+│   ├── excel_service.py         # Excel I/O operations
+│   ├── settings_manager.py      # Interactive setup wizard
+│   ├── config.py                # Configuration loader
+│   ├── models.py                # Segment dataclass
+│   ├── utils.py                 # PlaceholderManager utility
+│   └── html_report_service.py   # HTML report generation
+├── tests/
+│   ├── test_models.py           # 15 tests for data models
+│   ├── test_placeholder_manager.py  # 20 tests for placeholder logic
+│   └── test_validation_service.py   # 7 tests for validation
+└── .github/workflows/ci.yml     # CI pipeline
 ```
 
 **Data Flow:**
@@ -68,22 +81,29 @@ Excel → Load Segments → Protect Placeholders → Batch Translate → Validat
 ## Tests
 
 ```bash
-# Run validation tests
+# Run all tests
 python -m pytest tests/ -v
 
-# Manual module verification
-python -c "from src.validation_service import ValidationService; print('OK')"
+# Run with coverage
+python -m pytest tests/ --cov=src --cov-report=term-missing
+
+# Run linting
+ruff check src/ tests/
 ```
 
-**Coverage:** Placeholder extraction • Token order validation • API response parsing • Excel I/O
+**Results:** ✅ 42 tests passing | 100% coverage on models, utils, validation_service
 
 ---
 
-## CI
+## CI Pipeline
 
-![CI](https://img.shields.io/badge/CI-GitHub%20Actions-success)
+**GitHub Actions Workflow:** `.github/workflows/ci.yml`
 
-**Pipeline:** `lint` (Ruff) → `test` (pytest + coverage) → `build` (dependency check)
+| Stage | Tools | Description |
+|-------|-------|-------------|
+| **lint** | Ruff | Code linting + format check |
+| **test** | pytest + coverage | 42 unit tests with coverage report |
+| **build** | Python imports | Verify all modules load correctly |
 
 ---
 
@@ -104,6 +124,7 @@ python -c "from src.validation_service import ValidationService; print('OK')"
 | **Gap Filling** | Auto-detects and retries failed translations |
 | **Custom Prompts** | Domain-specific AI instructions via external file |
 | **Status Reports** | CSV logs with OK / MISSING_TOKENS / COPIED_SOURCE |
+| **HTML Reports** | Visual summary with per-sheet breakdown |
 
 ---
 

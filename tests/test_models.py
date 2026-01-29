@@ -1,6 +1,5 @@
 """Tests for data models."""
 
-import pytest
 from models import Segment, TranslationResult, ValidationReport
 
 

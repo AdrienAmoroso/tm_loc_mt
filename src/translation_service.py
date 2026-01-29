@@ -3,14 +3,13 @@
 import json
 import logging
 import time
-from typing import List, Dict
 
 from google import genai
 from google.genai import types
 from openai import OpenAI
 
-from models import Segment
 from config import Config
+from models import Segment
 from utils import PlaceholderManager
 
 logger = logging.getLogger(__name__)
@@ -18,24 +17,24 @@ logger = logging.getLogger(__name__)
 
 class TranslationService:
     """Handles API calls to OpenAI or Gemini for translation."""
-    
+
     def __init__(self, config: Config):
         self.config = config
-        
+
         if config.api.use_gemini:
             self.client = genai.Client(api_key=config.api.gemini_api_key)
         else:
             self.client = OpenAI(api_key=config.api.openai_api_key)
-    
+
     def build_system_prompt(self) -> str:
         """Build the system prompt for the AI model.
-        
+
         Uses custom prompt from config if provided, otherwise uses generic default.
         Supports {source} and {target} placeholders that are replaced with actual languages.
         """
         source = self.config.translation.source_lang
         target = self.config.translation.target_lang
-        
+
         # Use custom prompt if configured, otherwise use generic default
         if self.config.translation.ai_prompt:
             custom_prompt = self.config.translation.ai_prompt
@@ -45,7 +44,7 @@ class TranslationService:
             except KeyError:
                 # If format() fails, return as-is (no placeholders)
                 return custom_prompt
-        
+
         # Generic default prompt for any localization project
         return f"""You are a professional localization translator.
 
@@ -87,26 +86,28 @@ RESPONSE FORMAT
 }}
 
 - Return exactly as many translations as segments provided in INPUT."""
-    
-    def build_user_content(self, batch: List[Segment]) -> str:
+
+    def build_user_content(self, batch: list[Segment]) -> str:
         """Build the user message payload for API."""
         payload = {"segments": []}
-        
+
         for seg in batch:
             protected, _ = PlaceholderManager.protect(seg.source_text)
-            payload["segments"].append({
-                "key": seg.key,
-                "sheet": seg.sheet,
-                "source": protected,
-                "comment": seg.comment,
-            })
-        
+            payload["segments"].append(
+                {
+                    "key": seg.key,
+                    "sheet": seg.sheet,
+                    "source": protected,
+                    "comment": seg.comment,
+                }
+            )
+
         return json.dumps(payload, ensure_ascii=False)
-    
-    def translate_batch(self, batch: List[Segment]) -> Dict[str, str]:
+
+    def translate_batch(self, batch: list[Segment]) -> dict[str, str]:
         """
         Translate a batch of segments.
-        
+
         Returns:
             Dict mapping key -> translated_text
         """
@@ -114,135 +115,135 @@ RESPONSE FORMAT
             return self._translate_with_gemini(batch)
         else:
             return self._translate_with_openai(batch)
-    
-    def _translate_with_gemini(self, batch: List[Segment]) -> Dict[str, str]:
+
+    def _translate_with_gemini(self, batch: list[Segment]) -> dict[str, str]:
         """Translate using Google Gemini API."""
         system_prompt = self.build_system_prompt()
         user_content = self.build_user_content(batch)
         full_prompt = system_prompt + "\n\n" + user_content
-        
+
         gen_config = types.GenerateContentConfig(
             temperature=0.0,
             candidate_count=1,
             response_mime_type="application/json",
         )
-        
+
         last_exception = None
-        
+
         for attempt in range(1, self.config.api.max_retries_gemini + 1):
             try:
                 logger.debug(
                     f"[Gemini] Calling {self.config.api.gemini_model} for batch of "
                     f"{len(batch)} segments (attempt {attempt}/{self.config.api.max_retries_gemini})"
                 )
-                
+
                 response = self.client.models.generate_content(
                     model=self.config.api.gemini_model,
                     contents=full_prompt,
                     config=gen_config,
                 )
-                
+
                 raw_text = response.text
                 result = self._parse_json_response(raw_text)
-                
+
                 if result:
                     logger.debug(f"[Gemini] Successfully translated {len(result)} segments")
-                
+
                 return result
-            
+
             except json.JSONDecodeError as e:
                 logger.error(f"[Gemini] JSON parse error: {e}")
                 last_exception = e
-            
+
             except Exception as e:
                 msg = str(e)
-                
+
                 # Handle rate limiting
                 if "429" in msg or "RESOURCE_EXHAUSTED" in msg or "rate limit" in msg.lower():
                     wait_time = self.config.api.rate_limit_wait * attempt
                     logger.warning(f"[Gemini] Rate limited, waiting {wait_time}s before retry...")
                     time.sleep(wait_time)
                     continue
-                
+
                 logger.error(f"[Gemini] API error (attempt {attempt}): {e}")
                 last_exception = e
-                
+
                 if attempt < self.config.api.max_retries_gemini:
                     wait_time = 5.0 * attempt
                     logger.debug(f"[Gemini] Retrying in {wait_time}s...")
                     time.sleep(wait_time)
-        
+
         if last_exception:
             raise last_exception
         raise RuntimeError("Failed to translate batch with Gemini")
-    
-    def _translate_with_openai(self, batch: List[Segment]) -> Dict[str, str]:
+
+    def _translate_with_openai(self, batch: list[Segment]) -> dict[str, str]:
         """Translate using OpenAI API."""
         system_prompt = self.build_system_prompt()
         user_content = self.build_user_content(batch)
-        
+
         last_exception = None
-        
+
         for attempt in range(1, self.config.api.max_retries_openai + 1):
             try:
                 logger.debug(
                     f"[OpenAI] Calling {self.config.api.openai_model} for batch of "
                     f"{len(batch)} segments (attempt {attempt}/{self.config.api.max_retries_openai})"
                 )
-                
+
                 response = self.client.responses.create(
                     model=self.config.api.openai_model,
                     input=[
                         {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_content}
-                    ]
+                        {"role": "user", "content": user_content},
+                    ],
                 )
-                
+
                 raw_text = response.output[0].content[0].text
                 result = self._parse_json_response(raw_text)
-                
+
                 if result:
                     logger.debug(f"[OpenAI] Successfully translated {len(result)} segments")
-                
+
                 return result
-            
+
             except json.JSONDecodeError as e:
                 logger.error(f"[OpenAI] JSON parse error: {e}")
                 last_exception = e
-            
+
             except Exception as e:
                 msg = str(e)
-                
+
                 # Handle rate limiting
                 if "rate_limit_exceeded" in msg or "Rate limit reached" in msg:
                     wait_time = self.config.api.rate_limit_wait * attempt
                     logger.warning(f"[OpenAI] Rate limited, waiting {wait_time}s before retry...")
                     time.sleep(wait_time)
                     continue
-                
+
                 logger.error(f"[OpenAI] API error (attempt {attempt}): {e}")
                 last_exception = e
-                
+
                 if attempt < self.config.api.max_retries_openai:
                     wait_time = 5.0 * attempt
                     logger.debug(f"[OpenAI] Retrying in {wait_time}s...")
                     time.sleep(wait_time)
-        
+
         if last_exception:
             raise last_exception
         raise RuntimeError("Failed to translate batch with OpenAI")
-    
+
     @staticmethod
-    def _parse_json_response(raw_text: str) -> Dict[str, str]:
+    def _parse_json_response(raw_text: str) -> dict[str, str]:
         """Parse JSON response from API."""
         data = json.loads(raw_text)
-        
+
         if "translations" not in data:
             raise ValueError("Missing 'translations' key in API response")
-        
+
         if not isinstance(data["translations"], list):
             raise ValueError("'translations' must be a list")
-        
+
         result = {}
         for item in data["translations"]:
             if isinstance(item, dict):
@@ -250,5 +251,5 @@ RESPONSE FORMAT
                 text = item.get("text", "")
                 if key:
                     result[str(key)] = str(text)
-        
+
         return result

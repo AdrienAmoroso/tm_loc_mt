@@ -1,7 +1,5 @@
 """Tests for ValidationService."""
 
-import pytest
-from models import Segment
 from validation_service import ValidationService
 
 
@@ -11,13 +9,13 @@ class TestValidationService:
     def test_validate_plain_text(self, sample_segment):
         """Plain text without placeholders should validate successfully."""
         translated = "Bem-vindo ao jogo!"
-        
+
         report = ValidationService.validate_translation(
             segment=sample_segment,
             translated_text=translated,
             placeholder_map={},
         )
-        
+
         assert report.is_valid is True
         assert report.missing_tokens == []
         assert report.out_of_order is False
@@ -30,13 +28,13 @@ class TestValidationService:
             "__VAR0__": "{[player_name]}",
             "__VAR1__": "{[coins]}",
         }
-        
+
         report = ValidationService.validate_translation(
             segment=segment_with_var,
             translated_text=translated,
             placeholder_map=placeholder_map,
         )
-        
+
         assert report.is_valid is True
 
     def test_validate_missing_token(self, segment_with_var):
@@ -47,13 +45,13 @@ class TestValidationService:
             "__VAR0__": "{[player_name]}",
             "__VAR1__": "{[coins]}",
         }
-        
+
         report = ValidationService.validate_translation(
             segment=segment_with_var,
             translated_text=translated,
             placeholder_map=placeholder_map,
         )
-        
+
         assert report.is_valid is False
         assert "__VAR1__" in report.missing_tokens
 
@@ -65,13 +63,13 @@ class TestValidationService:
             "__VAR0__": "{[player_name]}",
             "__VAR1__": "{[coins]}",
         }
-        
+
         report = ValidationService.validate_translation(
             segment=segment_with_var,
             translated_text=translated,
             placeholder_map=placeholder_map,
         )
-        
+
         assert report.is_valid is False
         assert report.out_of_order is True
 
@@ -82,13 +80,13 @@ class TestValidationService:
             "__TAG0__": "<b>",
             "__TAG1__": "</b>",
         }
-        
+
         report = ValidationService.validate_translation(
             segment=segment_with_tags,
             translated_text=translated,
             placeholder_map=placeholder_map,
         )
-        
+
         assert report.is_valid is True
 
     def test_validate_mixed_placeholders(self, segment_with_mixed):
@@ -100,13 +98,13 @@ class TestValidationService:
             "__TAG0__": "<player>",
             "__TAG1__": "</player>",
         }
-        
+
         report = ValidationService.validate_translation(
             segment=segment_with_mixed,
             translated_text=translated,
             placeholder_map=placeholder_map,
         )
-        
+
         assert report.is_valid is True
 
     def test_validate_all_tokens_missing(self, segment_with_var):
@@ -116,12 +114,12 @@ class TestValidationService:
             "__VAR0__": "{[player_name]}",
             "__VAR1__": "{[coins]}",
         }
-        
+
         report = ValidationService.validate_translation(
             segment=segment_with_var,
             translated_text=translated,
             placeholder_map=placeholder_map,
         )
-        
+
         assert report.is_valid is False
         assert len(report.missing_tokens) == 2
