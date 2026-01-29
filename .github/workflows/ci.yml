@@ -71,9 +71,9 @@ jobs:
       
       - name: Verify imports
         run: |
-          python -c "from src.models import Segment; print('OK models')"
-          python -c "from src.utils import PlaceholderManager; print('OK utils')"
-          python -c "from src.validation_service import ValidationService; print('OK validation_service')"
-          python -c "from src.excel_service import ExcelService; print('OK excel_service')"
-          python -c "from src.translation_service import TranslationService; print('OK translation_service')"
+          cd src && python -c "from models import Segment; print('OK models')"
+          cd src && python -c "from utils import PlaceholderManager; print('OK utils')"
+          cd src && python -c "from validation_service import ValidationService; print('OK validation_service')"
+          cd src && python -c "from excel_service import ExcelService; print('OK excel_service')"
+          cd src && python -c "from translation_service import TranslationService; print('OK translation_service')"
           echo "All modules import successfully"
